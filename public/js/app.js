@@ -20,43 +20,43 @@
  * after completion of SVG inlining.
  * @returns {undefined} undefined
  */
-var svgToInlineSvg = function(completionFn) {
-    var deferredObjs = [];
+var svgToInlineSvg = function (completionFn) {
+  var deferredObjs = [];
 
-    $('img.svg').each(function() {
-        var $img = jQuery(this);
-        var imgID = $img.attr('id');
-        var imgClass = $img.attr('class');
-        var imgURL = $img.attr('src');
+  $('img.svg').each(function () {
+    var $img = jQuery(this);
+    var imgID = $img.attr('id');
+    var imgClass = $img.attr('class');
+    var imgURL = $img.attr('src');
 
-        deferredObjs.push(jQuery.get(imgURL, function(data) {
-            var $svg = jQuery(data).find('svg');
-            if (typeof imgID !== 'undefined') {
-                $svg = $svg.attr('id', imgID);
-            }
-            if (typeof imgClass !== 'undefined') {
-                $svg = $svg.attr('class', imgClass + ' replaced-svg');
-            }
-            $svg = $svg.removeAttr('xmlns:a');
-            $img.replaceWith($svg);
-        }, 'xml'));
-    });
+    deferredObjs.push(jQuery.get(imgURL, function (data) {
+      var $svg = jQuery(data).find('svg');
+      if (typeof imgID !== 'undefined') {
+        $svg = $svg.attr('id', imgID);
+      }
+      if (typeof imgClass !== 'undefined') {
+        $svg = $svg.attr('class', imgClass + ' replaced-svg');
+      }
+      $svg = $svg.removeAttr('xmlns:a');
+      $img.replaceWith($svg);
+    }, 'xml'));
+  });
 
-    // Wait for all the AJAX operations to finish before we call the "finished" callback
-    $.when.apply($, deferredObjs).done(function() {
-        if (completionFn !== undefined) {
-            completionFn();
-        }
-    });
+  // Wait for all the AJAX operations to finish before we call the "finished" callback
+  $.when.apply($, deferredObjs).done(function () {
+    if (completionFn !== undefined) {
+      completionFn();
+    }
+  });
 };
 
 // The "About" dialog template
 var attrDialogTmpl = Handlebars.compile(
-    // @todo Add some blob of text/image here
-    // @todo FIXME: modify attribution information here
-    // @todo Check the LICENSE for each of the used frameworks to figure out if there
-    //       are any instances of being not compliant
-    '<div style="text-align: center">' +
+  // @todo Add some blob of text/image here
+  // @todo FIXME: modify attribution information here
+  // @todo Check the LICENSE for each of the used frameworks to figure out if there
+  //       are any instances of being not compliant
+  '<div style="text-align: center">' +
     '  <img style="width: 176px; height: 203px;" src="/images/about_tubertc.svg" alt="[about]">' +
     '</div>' +
     '<ul>' +
@@ -71,29 +71,29 @@ var attrDialogTmpl = Handlebars.compile(
 );
 
 // Main entry point
-$(document).ready(function() {
-    NavBar.initialize();
-    NavBar.attrBtn.onClick(function() {
-        Dialog.show({
-            title: 'About',
-            content: attrDialogTmpl({})
-        });
+$(document).ready(function () {
+  NavBar.initialize();
+  NavBar.attrBtn.onClick(function () {
+    Dialog.show({
+      title: 'About',
+      content: attrDialogTmpl({})
     });
+  });
 
-    Clock.initialize();
+  Clock.initialize();
 
-    svgToInlineSvg(function() {
-        NavBar.show();
-        Login
-            .initialize({
-                cameraBtn: NavBar.cameraBtn,
-                micBtn: NavBar.micBtn,
-                dashBtn: NavBar.dashBtn
-            })
-            .done(function(params) {
-                // This is called if the userName and roomName are valid and we are ready to join
-                // the chat. At this point, when call vtcMain()
-                vtcMain(params);
-            });
-    });
+  svgToInlineSvg(function () {
+    NavBar.show();
+    Login
+      .initialize({
+        cameraBtn: NavBar.cameraBtn,
+        micBtn: NavBar.micBtn,
+        dashBtn: NavBar.dashBtn
+      })
+      .done(function (params) {
+        // This is called if the userName and roomName are valid and we are ready to join
+        // the chat. At this point, when call vtcMain()
+        vtcMain(params);
+      });
+  });
 });

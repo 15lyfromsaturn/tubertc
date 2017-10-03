@@ -12,26 +12,26 @@
  * @param {String} id - CSS ID selector.
  * @class
  */
-var Button = function(id) {
-    var idSel = $(id);
-    var _kDefaultColor = '#cccccc';
-    var _kDisabledColor = '#404040';
-    var _buttonIsEnabled = true;
+var Button = function (id) {
+  var idSel = $(id);
+  var _kDefaultColor = '#cccccc';
+  var _kDisabledColor = '#404040';
+  var _buttonIsEnabled = true;
 
-    this.id = id;
-    this.clickFn = null;
+  this.id = id;
+  this.clickFn = null;
 
-    var _this = this;
+  var _this = this;
 
-    /**
+  /**
      * Fills the element with the default color.
      *
      * @returns {undefined} undefined
      * @private
      */
-    var _paintColor = function() {
-        idSel.css('fill', _kDefaultColor);
-    };
+  var _paintColor = function () {
+    idSel.css('fill', _kDefaultColor);
+  };
 
     /**
      * Disables the button.
@@ -39,27 +39,27 @@ var Button = function(id) {
      * @returns {undefined} undefined
      * @public
      */
-    this.disableButton = function() {
-        _buttonIsEnabled = false;
-        idSel
-            .css('opacity', '0.3')
-            .css('fill', _kDisabledColor);
-    };
+  this.disableButton = function () {
+    _buttonIsEnabled = false;
+    idSel
+      .css('opacity', '0.3')
+      .css('fill', _kDisabledColor);
+  };
 
-    /**
+  /**
      * Enables the button.
      *
      * @returns {undefined} undefined
      * @public
      */
-    this.enableButton = function() {
-        _buttonIsEnabled = true;
-        idSel
-            .css('opacity', '1')
-            .css('fill', _kDefaultColor);
-    };
+  this.enableButton = function () {
+    _buttonIsEnabled = true;
+    idSel
+      .css('opacity', '1')
+      .css('fill', _kDefaultColor);
+  };
 
-    /**
+  /**
      * Click handler.
      *
      * @param {Function} clickFn - Callback function
@@ -67,35 +67,35 @@ var Button = function(id) {
      * @returns {undefined} undefined
      * @public
      */
-    this.onClick = function(clickFn) {
-        this.clickFn = clickFn;
-    };
+  this.onClick = function (clickFn) {
+    this.clickFn = clickFn;
+  };
 
-    idSel.hover(function() {
-        if (_buttonIsEnabled) {
-            idSel.css('opacity', '0.5');
-        }
-    }, function() {
-        if (_buttonIsEnabled) {
-            idSel.css('opacity', '1');
-        }
-    });
+  idSel.hover(function () {
+    if (_buttonIsEnabled) {
+      idSel.css('opacity', '0.5');
+    }
+  }, function () {
+    if (_buttonIsEnabled) {
+      idSel.css('opacity', '1');
+    }
+  });
 
-    idSel.click(function() {
-        if (_buttonIsEnabled) {
-            if (_this.clickFn !== null) {
-                _this.clickFn();
-            } else {
-                ErrorMetric.log(id + '.click => Button.clickFn not defined');
-            }
-        }
+  idSel.click(function () {
+    if (_buttonIsEnabled) {
+      if (_this.clickFn !== null) {
+        _this.clickFn();
+      } else {
+        ErrorMetric.log(id + '.click => Button.clickFn not defined');
+      }
+    }
 
-        idSel.blur();
-    });
+    idSel.blur();
+  });
 
-    _paintColor();
+  _paintColor();
 
-    return this;
+  return this;
 };
 
 /**
@@ -106,41 +106,41 @@ var Button = function(id) {
  * false otherwise.
  * @class
  */
-var StatefulButton = function(id, selected) {
-    var idSel = $(id);
-    var _kSelectedColor = '#009966';
-    var _kUnselectedColor = '#cc0033';
-    var _buttonIsEnabled = true;
+var StatefulButton = function (id, selected) {
+  var idSel = $(id);
+  var _kSelectedColor = '#009966';
+  var _kUnselectedColor = '#cc0033';
+  var _buttonIsEnabled = true;
 
-    this.id = id;
-    this.selectedFn = null;
-    this.unselectedFn = null;
+  this.id = id;
+  this.selectedFn = null;
+  this.unselectedFn = null;
 
-    this.selected = selected;
-    if (selected === undefined) {
-        this.selected = false;
-    }
+  this.selected = selected;
+  if (selected === undefined) {
+    this.selected = false;
+  }
 
-    var _this = this;
+  var _this = this;
 
-    /**
+  /**
      * Fills the element with the appropriate color.
      *
      * @returns {undefined} undefined
      * @private
      */
-    var _paintColor = function() {
-        if (_this.selected) {
-            idSel.css('fill', _kSelectedColor);
-        } else {
-            idSel.css('fill', _kUnselectedColor);
-        }
-    };
+  var _paintColor = function () {
+    if (_this.selected) {
+      idSel.css('fill', _kSelectedColor);
+    } else {
+      idSel.css('fill', _kUnselectedColor);
+    }
+  };
 
-    var _toggleCallbacks = {};
-    var _currentToggleId = 0;
+  var _toggleCallbacks = {};
+  var _currentToggleId = 0;
 
-    /**
+  /**
      * Invokes all toggle listener callbacks.
      *
      * @param {Boolean} newState - The new state
@@ -148,13 +148,13 @@ var StatefulButton = function(id, selected) {
      * @returns {undefined} undefined
      * @private
      */
-    var _invokeToggleListenerCallbacks = function(newState) {
-        for (var cb in _toggleCallbacks) {
-            if (_toggleCallbacks.hasOwnProperty(cb)) {
-                _toggleCallbacks[cb](newState);
-            }
-        }
-    };
+  var _invokeToggleListenerCallbacks = function (newState) {
+    for (var cb in _toggleCallbacks) {
+      if (_toggleCallbacks.hasOwnProperty(cb)) {
+        _toggleCallbacks[cb](newState);
+      }
+    }
+  };
 
     /**
      * Adds a toggle event listener.
@@ -165,12 +165,12 @@ var StatefulButton = function(id, selected) {
      * listener callback (to be used with removeToggleEventListener).
      * @public
      */
-    this.addToggleEventListener = function(handler) {
-        _toggleCallbacks[_currentToggleId] = handler;
-        return _currentToggleId++;
-    };
+  this.addToggleEventListener = function (handler) {
+    _toggleCallbacks[_currentToggleId] = handler;
+    return _currentToggleId++;
+  };
 
-    /**
+  /**
      * Removes a toggle event listener.
      *
      * @param {Number} id - ID of the toggle
@@ -178,82 +178,82 @@ var StatefulButton = function(id, selected) {
      * @returns {undefined} undefined
      * @public
      */
-    this.removeToggleEventListener = function(id) {
-        if (_toggleCallbacks[id] !== undefined) {
-            delete _toggleCallbacks[id];
-        } else {
-            ErrorMetric.log('StatefulButton.removeToggleEventListener => bad id "' + id + '"');
-        }
-    };
+  this.removeToggleEventListener = function (id) {
+    if (_toggleCallbacks[id] !== undefined) {
+      delete _toggleCallbacks[id];
+    } else {
+      ErrorMetric.log('StatefulButton.removeToggleEventListener => bad id "' + id + '"');
+    }
+  };
 
-    /**
+  /**
      * Disables the button.
      *
      * @returns {undefined} undefined
      * @public
      */
-    this.disableButton = function() {
-        _buttonIsEnabled = false;
-        idSel
-            .css('opacity', '0.3')
-            .attr('title', 'Button is disabled');
-    };
+  this.disableButton = function () {
+    _buttonIsEnabled = false;
+    idSel
+      .css('opacity', '0.3')
+      .attr('title', 'Button is disabled');
+  };
 
-    /**
+  /**
      * Checks whether the button is enabled.
      *
      * @returns {Boolean} True if enabled,
      * false otherwise.
      * @public
      */
-    this.isEnabled = function() {
-        return _buttonIsEnabled;
-    };
+  this.isEnabled = function () {
+    return _buttonIsEnabled;
+  };
 
-    /**
+  /**
      * Enables the button.
      *
      * @returns {undefined} undefined
      * @public
      */
-    this.enableButton = function() {
-        _buttonIsEnabled = true;
-        idSel
-            .css('opacity', '1')
-            .removeAttr('title');
-    };
+  this.enableButton = function () {
+    _buttonIsEnabled = true;
+    idSel
+      .css('opacity', '1')
+      .removeAttr('title');
+  };
 
-    /**
+  /**
      * Clicks the button.
      *
      * @returns {undefined} undefined
      * @public
      */
-    this.clickButton = function() {
-        idSel.click();
-    };
+  this.clickButton = function () {
+    idSel.click();
+  };
 
-    /**
+  /**
      * Toggles the state of the button and
      * repaints the button's icon color.
      *
      * @returns {undefined} undefined
      * @public
      */
-    this.toggle = function() {
-        if (_buttonIsEnabled) {
-            if (this.selected) {
-                this.selected = false;
-            } else {
-                this.selected = true;
-            }
+  this.toggle = function () {
+    if (_buttonIsEnabled) {
+      if (this.selected) {
+        this.selected = false;
+      } else {
+        this.selected = true;
+      }
 
-            _invokeToggleListenerCallbacks(this.selected);
-            _paintColor();
-        }
-    };
+      _invokeToggleListenerCallbacks(this.selected);
+      _paintColor();
+    }
+  };
 
-    /**
+  /**
      * Handler that registers functions for button
      * selection and deselection.
      *
@@ -266,87 +266,87 @@ var StatefulButton = function(id, selected) {
      * @returns {undefined} undefined
      * @public
      */
-    this.handle = function(selectedFn, unselectedFn) {
-        this.selectedFn = selectedFn;
-        this.unselectedFn = unselectedFn;
-    };
+  this.handle = function (selectedFn, unselectedFn) {
+    this.selectedFn = selectedFn;
+    this.unselectedFn = unselectedFn;
+  };
 
-    /**
+  /**
      * Returns the current state of the button.
      *
      * @returns {Boolean} True if selected,
      * false otherwise.
      * @public
      */
-    this.isSelected = function() {
-        return this.selected;
-    };
+  this.isSelected = function () {
+    return this.selected;
+  };
 
-    idSel.hover(function() {
-        if (_buttonIsEnabled) {
-            idSel.css('opacity', '0.5');
+  idSel.hover(function () {
+    if (_buttonIsEnabled) {
+      idSel.css('opacity', '0.5');
+    }
+  }, function () {
+    if (_buttonIsEnabled) {
+      idSel.css('opacity', '1');
+    }
+  });
+
+  idSel.click(function () {
+    _this.toggle();
+
+    if (_buttonIsEnabled) {
+      if (_this.isSelected()) {
+        if (_this.selectedFn !== null) {
+          _this.selectedFn();
+        } else {
+          // FIXME: is this spamming my telemetry log?
+          ErrorMetric.log(id + '.click => StatefulButton.selectedFn not defined');
         }
-    }, function() {
-        if (_buttonIsEnabled) {
-            idSel.css('opacity', '1');
+      } else {
+        if (_this.unselectedFn !== null) {
+          _this.unselectedFn();
+        } else {
+          // FIXME: is this spamming my telemetry log?
+          ErrorMetric.log(id + '.click => StatefulButton.unselectedFn not defined');
         }
-    });
+      }
+    }
 
-    idSel.click(function() {
-        _this.toggle();
+    idSel.blur();
+  });
 
-        if (_buttonIsEnabled) {
-            if (_this.isSelected()) {
-                if (_this.selectedFn !== null) {
-                    _this.selectedFn();
-                } else {
-                    // FIXME: is this spamming my telemetry log?
-                    ErrorMetric.log(id + '.click => StatefulButton.selectedFn not defined');
-                }
-            } else {
-                if (_this.unselectedFn !== null) {
-                    _this.unselectedFn();
-                } else {
-                    // FIXME: is this spamming my telemetry log?
-                    ErrorMetric.log(id + '.click => StatefulButton.unselectedFn not defined');
-                }
-            }
-        }
+  _paintColor();
 
-        idSel.blur();
-    });
-
-    _paintColor();
-
-    return this;
+  return this;
 };
 
 var NavBar = {
-    cameraBtn: null,
-    micBtn: null,
-    dashBtn: null,
-    attrBtn: null,
+  cameraBtn: null,
+  micBtn: null,
+  dashBtn: null,
+  attrBtn: null,
 
-    /**
+  /**
      * Initializes the navBar buttons.
      *
      * @returns {undefined} undefined
      * @public
      */
-    initialize: function() {
-        this.cameraBtn = new StatefulButton('#cameraBtn', true);
-        this.micBtn = new StatefulButton('#micBtn', true);
-        this.dashBtn = new StatefulButton('#dashBtn');
-        this.attrBtn = new Button('#attrBtn');
-    },
+  initialize: function () {
+    this.cameraBtn = new StatefulButton('#cameraBtn', true);
+    this.micBtn = new StatefulButton('#micBtn', true);
+    this.dashBtn = new StatefulButton('#dashBtn');
+    this.attrBtn = new Button('#attrBtn');
+  },
 
-    /**
+  /**
      * Fades in the navBar.
      *
      * @returns {undefined} undefined
      * @public
      */
-    show: function() {
-        $('.navBar').fadeIn();
-    }
+  show: function () {
+    $('.navBar').fadeIn();
+  }
 };

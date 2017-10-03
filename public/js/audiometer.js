@@ -26,13 +26,13 @@ var kSampleAverageInterval = 16;
 var kBroadcastRMSThreshold = 0.08;
 
 var AudioMeter = {
-    // Stores a mapping of peerId with objects needed to update and teardown associated items
-    _map: {},
+  // Stores a mapping of peerId with objects needed to update and teardown associated items
+  _map: {},
 
-    // This will be set when init() is called and should be non-null
-    _client: null,
+  // This will be set when init() is called and should be non-null
+  _client: null,
 
-    /**
+  /**
      * Animates the fill meter.
      *
      * @param {Object} fillMeter - Fill meter object
@@ -42,23 +42,23 @@ var AudioMeter = {
      * @returns {undefined} undefined
      * @private
      */
-    _animateFillMeter: function(fillMeter, rms) {
+  _animateFillMeter: function (fillMeter, rms) {
+    fillMeter
+      .stop()
+      .animate({
+        width: (rms * 100) + '%'
+      }, 250,
+      function () {
+        // Make the meter "bounce" back to 0
         fillMeter
-            .stop()
-            .animate({
-                width: (rms * 100) + '%'
-            }, 250,
-            function() {
-                // Make the meter "bounce" back to 0
-                fillMeter
-                    .stop()
-                    .animate({
-                        width: '0%'
-                    }, 250);
-            });
-    },
+          .stop()
+          .animate({
+            width: '0%'
+          }, 250);
+      });
+  },
 
-    /**
+  /**
      * Initializes the audio meter.
      *
      * @param {Object} client - VTCClient object of
@@ -66,11 +66,11 @@ var AudioMeter = {
      * @returns {undefined} undefined
      * @public
      */
-    init: function(client) {
-        this._client = client;
-    },
+  init: function (client) {
+    this._client = client;
+  },
 
-    /**
+  /**
      * Handles the peer message.
      *
      * @param {String} peerId - Peer ID that sent
@@ -86,21 +86,21 @@ var AudioMeter = {
      * @returns {undefined} undefined
      * @public
      */
-    handlePeerMessage: function(peerId, content) {
-        if (peerId !== this._client.getId()) {
-            var item = this._map[peerId];
-            if (item !== undefined) {
-                var fillMeter = item.fillMeter;
-                if (typeof content.rms === 'number' && content.rms <= 1) {
-                    this._animateFillMeter(fillMeter, content.rms);
-                }
-            } else {
-                ErrorMetric.log('AudioMeter.handlePeerMessage => ' + peerId + ' is not valid');
-            }
+  handlePeerMessage: function (peerId, content) {
+    if (peerId !== this._client.getId()) {
+      var item = this._map[peerId];
+      if (item !== undefined) {
+        var fillMeter = item.fillMeter;
+        if (typeof content.rms === 'number' && content.rms <= 1) {
+          this._animateFillMeter(fillMeter, content.rms);
         }
-    },
+      } else {
+        ErrorMetric.log('AudioMeter.handlePeerMessage => ' + peerId + ' is not valid');
+      }
+    }
+  },
 
-    /**
+  /**
      * Creates a new AudioMeter for the MediaStream for
      * a given peerId.
      *
@@ -115,62 +115,62 @@ var AudioMeter = {
      * @returns {undefined} undefined
      * @public
      */
-    create: function(peerId, stream, meterFillElem, isLocalStream) {
-        var _this = this;
-        var audioContext = null;
-        var mediaStreamSource = null;
-        var processor = null;
-        var eventListenerId = null;
+  create: function (peerId, stream, meterFillElem, isLocalStream) {
+    var _this = this;
+    var audioContext = null;
+    var mediaStreamSource = null;
+    var processor = null;
+    var eventListenerId = null;
 
-        var _broadcastRms = function(rms) {
-            _this._client.sendPeerMessage({
-                room: _this._client.getRoomName()
-            }, 'audio-meter', {
-                rms: rms
-            });
-        };
+    var _broadcastRms = function (rms) {
+      _this._client.sendPeerMessage({
+        room: _this._client.getRoomName()
+      }, 'audio-meter', {
+        rms: rms
+      });
+    };
 
-        if (isLocalStream !== undefined && isLocalStream) {
-            audioContext = new AudioContext();
-            mediaStreamSource = audioContext.createMediaStreamSource(stream);
-            processor = audioContext.createScriptProcessor(kSampleSize, 1, 1);
+    if (isLocalStream !== undefined && isLocalStream) {
+      audioContext = new AudioContext();
+      mediaStreamSource = audioContext.createMediaStreamSource(stream);
+      processor = audioContext.createScriptProcessor(kSampleSize, 1, 1);
 
-            mediaStreamSource.connect(processor);
-            processor.connect(audioContext.destination);
+      mediaStreamSource.connect(processor);
+      processor.connect(audioContext.destination);
 
-            processor.onaudioprocess = function(evt) {
-                var buffer = evt.inputBuffer;
-                if (buffer.numberOfChannels > 0) {
-                    var inputData = buffer.getChannelData(0);
-                    var inputDataLength = inputData.length;
-                    var total = 0;
+      processor.onaudioprocess = function (evt) {
+        var buffer = evt.inputBuffer;
+        if (buffer.numberOfChannels > 0) {
+          var inputData = buffer.getChannelData(0);
+          var inputDataLength = inputData.length;
+          var total = 0;
 
-                    // We calculate the average of every X to prevent CPU fans from kicking in
-                    // on laptops!
-                    for (var i = 0; i < inputDataLength; i += kSampleAverageInterval) {
-                        total += Math.abs(inputData[i]);
-                    }
+          // We calculate the average of every X to prevent CPU fans from kicking in
+          // on laptops!
+          for (var i = 0; i < inputDataLength; i += kSampleAverageInterval) {
+            total += Math.abs(inputData[i]);
+          }
 
-                    var rms = Math.sqrt((kSampleAverageInterval * total) / inputDataLength);
-                    _this._animateFillMeter(meterFillElem, rms);
+          var rms = Math.sqrt((kSampleAverageInterval * total) / inputDataLength);
+          _this._animateFillMeter(meterFillElem, rms);
 
-                    // Only send our rms data if we are not muted.
-                    if (NavBar.micBtn.isSelected() && rms > kBroadcastRMSThreshold) {
-                        _broadcastRms(rms);
-                    }
-                }
-            };
+          // Only send our rms data if we are not muted.
+          if (NavBar.micBtn.isSelected() && rms > kBroadcastRMSThreshold) {
+            _broadcastRms(rms);
+          }
         }
+      };
+    }
 
-        this._map[peerId] = {
-            streamSource: mediaStreamSource,
-            processor: processor,
-            fillMeter: meterFillElem,
-            eventListenerId: eventListenerId
-        };
-    },
+    this._map[peerId] = {
+      streamSource: mediaStreamSource,
+      processor: processor,
+      fillMeter: meterFillElem,
+      eventListenerId: eventListenerId
+    };
+  },
 
-    /**
+  /**
      * Destroys the AudioMeter associated
      * with the provided Peer ID.
      *
@@ -179,18 +179,18 @@ var AudioMeter = {
      * @returns {undefined} undefined
      * @public
      */
-    destroy: function(peerId) {
-        var item = this._map[peerId];
-        if (item.streamSource !== null && item.processor !== null) {
-            item.streamSource.disconnect(item.processor);
-        }
-
-        if (item.eventListenerId !== null) {
-            NavBar.micBtn.removeToggleEventListener(item.eventListenerId);
-        }
-
-        delete this._map[peerId];
+  destroy: function (peerId) {
+    var item = this._map[peerId];
+    if (item.streamSource !== null && item.processor !== null) {
+      item.streamSource.disconnect(item.processor);
     }
+
+    if (item.eventListenerId !== null) {
+      NavBar.micBtn.removeToggleEventListener(item.eventListenerId);
+    }
+
+    delete this._map[peerId];
+  }
 };
 
 window.AudioContext = (window.AudioContext || window.webkitAudioContext);
