@@ -387,22 +387,22 @@ var Dashboard = function () {
       hangoutsViewport.elem.css({ width: '100%', 'padding-right': 0 });
 
       dashboard.rowArray[0].css({
-        height: '85%',
+        height: '95%',
         position: 'initial'
       });
       dashboard.rowArray[1].css({
-        height: '15%',
+        height: '5%',
         position: 'initial'
       });
     } else {
       hangoutsViewport.elem.css({ height: '100%', 'padding-bottom': 0 });
 
       dashboard.rowArray[0].css({
-        width: '80%',
+        width: '100%',
         position: 'initial'
       });
       dashboard.rowArray[1].css({
-        width: '20%',
+        width: '0%',
         position: 'initial'
       });
     }

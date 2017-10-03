@@ -11,17 +11,11 @@
     </head>
     <body>
         <div class="mainPanel appPage">
-            <div class="logo">
-                <img src="/images/logo.svg" alt="[tubertc]">
-            </div>
             <div class="navCenterer">
                 <div class="navBar">
                     <button id="cameraBtn"><img class="svg" src="/images/camera.svg" alt="[camera]"></button>
                     <button id="micBtn"><img class="svg" src="/images/mic.svg" alt="[mic]"></button>
                     <button id="dashBtn"><img class="svg" src="/images/dash.svg" alt="[dashboard]"></button>
-                    <button id="attrBtn"><img class="svg" src="/images/credits.svg" alt="[attr]"></button>
-                    &nbsp;&nbsp;
-                    <span id="timeLabel"></span>
                 </div>
             </div>
             <div class="roomName" id="roomNameField">
@@ -53,7 +47,7 @@
             </div>
         </div>
 
-        <div class="sidePanel appPage">
+        <div class="sidePanel appPage" style="display:none;">
             <div class="sidePanelContent">
                 <div class="chatHistoryPane chatPanel">
 
@@ -87,10 +81,8 @@
         <script type="text/javascript" src="/js/vendor/handlebars-v2.0.0.js"></script>
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
-        <script type="text/javascript" src="/js/dialog.js"></script>
         <script type="text/javascript" src="/js/sound.js"></script>
         <script type="text/javascript" src="/js/navbar.js"></script>
-        <script type="text/javascript" src="/js/clock.js"></script>
         <script type="text/javascript" src="/js/chat-cmds.js"></script>
         <script type="text/javascript" src="/js/chat.js"></script>
         <script type="text/javascript" src="/js/login.js"></script>

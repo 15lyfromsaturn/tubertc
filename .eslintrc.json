@@ -9,6 +9,7 @@
       "standard/object-curly-even-spacing": [2, "either"]
     },
     "globals": {
+      "$": true,
       "describe": true,
       "it": true,
       "window": true,
